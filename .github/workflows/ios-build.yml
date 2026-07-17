@@ -1,13 +1,11 @@
 name: iOS Build (Unsigned IPA)
 
 on:
-  workflow_dispatch:        # Manual trigger — Actions tab se "Run workflow" button
-  push:
-    branches: [ main ]      # main pe push hote hi auto build (nahi chahiye to ye block hata do)
+  workflow_dispatch:
 
 jobs:
   build-ios:
-    runs-on: macos-latest   # GitHub ka macOS runner (Xcode pre-installed)
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -18,7 +16,6 @@ jobs:
         with:
           channel: stable
           cache: true
-          # flutter-version: '3.32.0'   # Apne local `flutter --version` se match karna ho to uncomment
 
       - name: Flutter version check
         run: flutter --version
