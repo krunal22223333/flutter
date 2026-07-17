@@ -1,0 +1,44 @@
+name: iOS Build (Unsigned IPA)
+
+on:
+  workflow_dispatch:        # Manual trigger — Actions tab se "Run workflow" button
+  push:
+    branches: [ main ]      # main pe push hote hi auto build (nahi chahiye to ye block hata do)
+
+jobs:
+  build-ios:
+    runs-on: macos-latest   # GitHub ka macOS runner (Xcode pre-installed)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          # flutter-version: '3.32.0'   # Apne local `flutter --version` se match karna ho to uncomment
+
+      - name: Flutter version check
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r -y hcp_hrms_unsigned.ipa Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hcp-hrms-ios-ipa
+          path: build/ios/iphoneos/hcp_hrms_unsigned.ipa
+          retention-days: 7
